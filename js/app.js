@@ -305,7 +305,7 @@
         <div class="acciones" style="margin-top:8px"><button class="btn peq peligro" data-a="reiniciar">Borrar todo y empezar de cero</button></div>
       </details>
     </div>
-    <p class="nota-peq" style="text-align:center">Menú y Cesta · código abierto · <a href="https://github.com" data-repo target="_blank" rel="noopener">GitHub</a></p>`;
+    <p class="nota-peq" style="text-align:center">Menú y Cesta · código abierto · <a href="https://github.com/miguelmunozicam-del/menu-y-cesta" data-repo target="_blank" rel="noopener">GitHub</a></p>`;
     h += '</div></div>';
     $('#vista').innerHTML = h;
   }

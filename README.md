@@ -26,7 +26,7 @@ Para pasar tus datos del móvil al ordenador: *Casa → Exportar copia* y luego 
 
 ## Usarla
 
-**En línea:** abre la página de GitHub Pages del repositorio y, en el móvil, *Añadir a pantalla de inicio*.
+**En línea:** abre https://miguelmunozicam-del.github.io/menu-y-cesta/ y, en el móvil, *Añadir a pantalla de inicio*.
 
 **En local:** descarga el repositorio y abre `index.html` en el navegador. No necesita instalar nada.
 (Para probar el modo sin conexión hace falta servirla por `https` o `localhost`, por ejemplo con `python3 -m http.server`.)
