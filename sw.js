@@ -1,5 +1,5 @@
 /* Menú y Cesta — service worker: funciona sin conexión (útil en el súper). */
-const CACHE = 'menu-y-cesta-v1';
+const CACHE = 'menu-y-cesta-v2';
 const ARCHIVOS = [
   './', 'index.html', 'css/styles.css',
   'js/seed.js', 'js/storage.js', 'js/logic.js', 'js/app.js',

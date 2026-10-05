@@ -390,6 +390,7 @@
   // Receta (crear / editar)
   function hojaReceta(H) {
     const r = H.borrador;
+    const N = H.n || 4;
     const ingOpts = Object.keys(est.ingredientes).sort((a, b) => est.ingredientes[a].nombre.localeCompare(est.ingredientes[b].nombre, 'es'));
     let h = cabHoja(H.id ? 'Editar receta' : 'Nueva receta') + '<div class="cuerpo">';
     h += `<label class="campo">Nombre<input type="text" value="${esc(r.nombre)}" data-c="r-nombre" ${H.id ? '' : 'autofocus'} placeholder="Ej.: Lentejas con chorizo"></label>
@@ -397,12 +398,15 @@
         <label class="campo">Tipo<select data-c="r-tipo">${Object.entries(TIPOS).map(([k, v]) => `<option value="${k}" ${r.tipo === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
         <label class="campo">Grupo<select data-c="r-etiqueta">${Object.entries(ETIQUETAS).map(([k, v]) => `<option value="${k}" ${r.etiqueta === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
       </div>
-      <div><div class="nota" style="font-weight:600;margin-bottom:8px">Ingredientes <span class="nota-peq">· cantidad por adulto</span></div>
+      <div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span class="nota" style="font-weight:600">Ingredientes para</span>
+        <select data-c="r-n" style="width:auto;min-height:36px;padding:4px 10px" aria-label="Número de raciones">${[1, 2, 3, 4, 5, 6, 8, 10, 12].map((n) => `<option value="${n}" ${n === N ? 'selected' : ''}>${n}</option>`).join('')}</select>
+        <span class="nota" style="font-weight:600">${N === 1 ? 'ración' : 'raciones'}</span></div>
+        <p class="nota-peq" style="margin:-4px 0 8px">Escribe la receta como la haces en casa. La app la convierte a ración de adulto y la ajusta a tu familia cada día.</p>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${r.ingredientes.map(([iid, cant], idx) => {
           const g = est.ingredientes[iid];
           return `<div class="ing-fila"><span>${g ? esc(g.nombre) : '<i>¿?</i>'}</span>
-            <input type="number" min="0" step="any" value="${esc(cant)}" data-c="r-cant" data-i="${idx}" inputmode="decimal" aria-label="Cantidad de ${g ? esc(g.nombre) : ''}">
+            <input type="number" min="0" step="any" value="${esc(redondear(cant * N))}" data-c="r-cant" data-i="${idx}" inputmode="decimal" aria-label="Cantidad de ${g ? esc(g.nombre) : ''}">
             <span class="u">${g ? esc(g.unidad) : ''}</span>
             <button class="x" data-a="r-quitar-ing" data-i="${idx}" aria-label="Quitar">✕</button></div>`;
         }).join('') || '<p class="nota-peq" style="margin:0">Todavía sin ingredientes.</p>'}
@@ -431,6 +435,7 @@
     }
     return h + '</div>';
   }
+  const redondear = (x) => Math.round(Number(x) * 100) / 100;
   function usosReceta(id) {
     let n = 0;
     for (const s of Object.values(est.semanas)) s.dias.forEach((d) => ['comida', 'cena'].forEach((m) => d[m].platos.forEach((p) => { if (p === id) n++; })));
@@ -467,8 +472,8 @@
     let h = cabHoja(H.id ? 'Editar' : 'Añadir a la familia') + '<div class="cuerpo">';
     h += `<label class="campo">Nombre<input type="text" value="${esc(m.nombre)}" data-c="m-nombre" ${H.id ? '' : 'autofocus'} placeholder="Ej.: Lucía"></label>
       <label class="campo">Fecha de nacimiento<input type="date" value="${esc(m.nacimiento || '')}" data-c="m-nacimiento" max="${M.aISO(new Date())}"></label>
-      <p class="nota-peq" style="margin:-6px 0 0">${e != null ? `${e} años · ración por edad: ${M.fmtNum(auto, 2)} de adulto` : 'Con la fecha ajusto la ración y te aviso de su cumpleaños.'}</p>
-      <label class="campo">Ración (opcional, 1 = adulto)<input type="number" min="0" max="3" step="0.05" value="${m.racion == null ? '' : esc(m.racion)}" placeholder="Automática: ${M.fmtNum(auto, 2)}" data-c="m-racion" inputmode="decimal"></label>
+      <p class="nota-peq" style="margin:-6px 0 0" id="m-edad-txt">${e != null ? `${e} años · ración por edad: ${M.fmtNum(auto, 2)} de adulto` : 'Con la fecha ajusto la ración y te aviso de su cumpleaños.'}</p>
+      <label class="campo">Ración (opcional, 1 = adulto)<input type="number" min="0" max="3" step="0.05" value="${m.racion == null ? '' : esc(m.racion)}" placeholder="Automática: ${M.fmtNum(auto, 2)}" data-c="m-racion" id="m-racion-in" inputmode="decimal"></label>
       <div class="acciones"><button class="btn prim" data-a="m-guardar">Guardar</button>
         ${H.id ? '<button class="btn peligro" data-a="m-borrar">Quitar de la familia</button>' : ''}</div>
       <p class="nota-peq" style="margin:0">🔒 Estos datos se quedan en tu dispositivo.</p>`;
@@ -588,9 +593,9 @@
     'nueva-receta'(el) {
       const desde = el.dataset.desde === 'picker' && ui.hoja ? { dia: ui.hoja.dia, m: ui.hoja.m, slot: ui.hoja.picker } : null;
       const nombre = desde ? (ui.hoja.q || '') : '';
-      abrirHoja({ tipo: 'receta', id: null, desde, borrador: { nombre, tipo: desde && desde.slot === 1 ? 'segundo' : 'primero', etiqueta: 'otros', ingredientes: [] } });
+      abrirHoja({ tipo: 'receta', id: null, desde, n: 4, borrador: { nombre, tipo: desde && desde.slot === 1 ? 'segundo' : 'primero', etiqueta: 'otros', ingredientes: [] } });
     },
-    'editar-receta'(el) { abrirHoja({ tipo: 'receta', id: el.dataset.id, borrador: M.clonar(est.recetas[el.dataset.id]) }); },
+    'editar-receta'(el) { const r = est.recetas[el.dataset.id]; abrirHoja({ tipo: 'receta', id: el.dataset.id, n: r.racionesEditor || 4, borrador: M.clonar(r) }); },
     'r-quitar-ing'(el) { leerReceta(); ui.hoja.borrador.ingredientes.splice(Number(el.dataset.i), 1); pintarHoja(); },
     'r-anadir-ing'() {
       leerReceta();
@@ -607,8 +612,9 @@
       }
       const B = ui.hoja.borrador;
       const ex = B.ingredientes.find(([i]) => i === id);
+      const N = ui.hoja.n || 4;
       const def = M.esContable(est.ingredientes[id].unidad) ? 1 : 100;
-      if (ex) ex[1] = cant || ex[1]; else B.ingredientes.push([id, cant || def]);
+      if (ex) ex[1] = cant ? cant / N : ex[1]; else B.ingredientes.push([id, cant ? cant / N : def]);
       pintarHoja();
       setTimeout(() => { const f = $('[data-c="r-nuevo-nombre"]'); if (f) f.focus(); }, 20);
     },
@@ -617,6 +623,7 @@
       const H = ui.hoja, B = H.borrador;
       if (!B.nombre.trim()) { toast('Ponle un nombre'); return $('[data-c="r-nombre"]').focus(); }
       B.nombre = B.nombre.trim();
+      B.racionesEditor = H.n || 4;
       B.ingredientes = B.ingredientes.filter(([i, c]) => est.ingredientes[i] && Number(c) > 0).map(([i, c]) => [i, Number(c)]);
       let id = H.id;
       cambiar(() => {
@@ -635,7 +642,7 @@
       leerReceta();
       const B = M.clonar(ui.hoja.borrador);
       B.nombre += ' (copia)';
-      abrirHoja({ tipo: 'receta', id: null, borrador: B });
+      abrirHoja({ tipo: 'receta', id: null, n: ui.hoja.n, borrador: B });
     },
     'r-borrar'() {
       const id = ui.hoja.id;
@@ -744,7 +751,7 @@
     if (v('r-nombre') != null) B.nombre = v('r-nombre');
     if (v('r-tipo')) B.tipo = v('r-tipo');
     if (v('r-etiqueta')) B.etiqueta = v('r-etiqueta');
-    document.querySelectorAll('#hoja [data-c="r-cant"]').forEach((e) => { const i = Number(e.dataset.i); if (B.ingredientes[i]) B.ingredientes[i][1] = e.value === '' ? 0 : Number(e.value); });
+    document.querySelectorAll('#hoja [data-c="r-cant"]').forEach((e) => { const i = Number(e.dataset.i); if (B.ingredientes[i]) B.ingredientes[i][1] = e.value === '' ? 0 : Number(e.value) / (ui.hoja.n || 4); });
   }
   function leerIngrediente() {
     const B = ui.hoja.borrador;
@@ -754,6 +761,13 @@
     B.unidad = v('g-unidad');
     B.basico = $('#hoja [data-c="g-basico"]').checked;
     if (B.envase) { B.envase.nombre = (v('g-env-nombre') || 'envase').trim(); B.envase.cantidad = Number(v('g-env-cant')) || 0; }
+  }
+  // Solo actualiza el texto: repintar cerraría el selector de fecha (iOS).
+  function actualizarEdad(fecha) {
+    const e = M.edad(fecha || null), auto = M.racionPorEdad(e);
+    const t = $('#m-edad-txt'), r = $('#m-racion-in');
+    if (t) t.textContent = e != null && e >= 0 ? `${e} años · ración por edad: ${M.fmtNum(auto, 2)} de adulto` : 'Con la fecha ajusto la ración y te aviso de su cumpleaños.';
+    if (r) r.placeholder = 'Automática: ' + M.fmtNum(auto, 2);
   }
   function leerMiembro() {
     const B = ui.hoja.borrador;
@@ -794,16 +808,18 @@
       const existe = !v || Object.values(est.ingredientes).some((g) => norm(g.nombre) === v);
       $('#nuevo-ing-extra').classList.toggle('oculto', existe);
     }
-    if (c === 'm-nacimiento') { leerMiembro(); pintarHoja(); }
+    if (c === 'm-nacimiento') actualizarEdad(ev.target.value);
   });
 
   document.addEventListener('change', (ev) => {
     const el = ev.target, c = el.dataset.c;
+    if (c === 'm-nacimiento') actualizarEdad(el.value);
     if (c === 'supermercado') cambiar(() => { est.ajustes.supermercado = el.value; });
     if (c === 'personas') cambiar(() => { est.ajustes.personasSinFamilia = Math.max(1, Math.min(30, Number(el.value) || 1)); });
     if (c === 'fuera') cambiar(() => { M.semana(est, ui.semana).dias[ui.hoja.dia][ui.hoja.m].fuera = el.checked; });
     if (c === 'g-con-envase') { leerIngrediente(); ui.hoja.borrador.envase = el.checked ? { nombre: 'paquete', cantidad: M.esContable(ui.hoja.borrador.unidad) ? 6 : 500 } : null; pintarHoja(); }
     if (c === 'g-unidad') { leerIngrediente(); pintarHoja(); }
+    if (c === 'r-n') { leerReceta(); ui.hoja.n = Number(el.value) || 4; pintarHoja(); }
     if (c === 'importar' && el.files && el.files[0]) {
       const fr = new FileReader();
       fr.onload = () => {
