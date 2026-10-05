@@ -1,0 +1,22 @@
+{
+  "name": "Menú y Cesta",
+  "short_name": "Menú y Cesta",
+  "description": "Menú semanal familiar y lista de la compra ordenada por tu súper.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fbf6ee",
+  "theme_color": "#c8452c",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Lista de la compra", "url": "./#lista" },
+    { "name": "Menú de la semana", "url": "./#semana" }
+  ]
+}

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Menú y Cesta</title>
+  <meta name="description" content="Planifica el menú semanal de tu familia y obtén la lista de la compra completa, ordenada por los pasillos de tu súper.">
+  <meta name="theme-color" content="#c8452c" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1d1a17" media="(prefers-color-scheme: dark)">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Menú y Cesta">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="nav" aria-label="Secciones">
+      <div class="marca">
+        <img src="icons/icon.svg" alt="" width="34" height="34">
+        <span>Menú <em>y</em> Cesta</span>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button data-a="tab" data-tab="semana"><span class="ico" aria-hidden="true">📅</span><span>Semana</span></button>
+        <button data-a="tab" data-tab="lista"><span class="ico" aria-hidden="true">🛒</span><span>Lista</span><b class="badge" id="badge-lista"></b></button>
+        <button data-a="tab" data-tab="recetas"><span class="ico" aria-hidden="true">📖</span><span>Recetas</span></button>
+        <button data-a="tab" data-tab="casa"><span class="ico" aria-hidden="true">🏠</span><span>Casa</span></button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="cabecera" id="cabecera"></header>
+      <section id="vista" class="vista" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <div class="hoja-fondo" id="hoja-fondo" hidden></div>
+  <div class="hoja" id="hoja" role="dialog" aria-modal="true" hidden></div>
+  <div class="toast" id="toast" role="status" hidden></div>
+
+  <noscript>Menú y Cesta necesita JavaScript activado.</noscript>
+
+  <script src="js/seed.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/logic.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
